@@ -1,2 +1,2 @@
 # fractal
-Computing fractal in motion aka crystallisation
+Computing fractal in motion aka crystallisation.
