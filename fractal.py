@@ -2,38 +2,59 @@
 
 import random
 import tkinter
+import numpy as np
 from tkinter import ttk
 
 
-WIDTH = 1024
-HEIGHT = 768
-ITERATIONS = 25
+class Fractal:
+    def __init__(self, width, height, xa, xb, ya, yb):
+        self.width = width
+        self.height = height
+        self.xa = xa
+        self.xb = xb
+        self.ya = ya
+        self.yb = yb
+
+        self.image = tkinter.PhotoImage(width=width, height=height)
+        self.iteration = 0
+        self.r = 4
+        self.g = 8
+        self.b = 16
 
 
-root = tkinter.Tk()
+class Mandelbrot(Fractal):
+    def __init__(self, width, height, xa, xb, ya, yb):
+        super().__init__(width, height, xa, xb, ya, yb)
+        self.data = np.zeros((width, height), dtype=np.complex_)
+
+    def compute(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                c = complex(self.xa + (self.xb - self.xa) * x / self.width,
+                            self.ya + (self.yb - self.ya) * y / self.height)
+                self.data[x, y] = self.data[x, y]**2 + c
+
+                if abs(self.data[x, y]) < 2.0:
+                    rd = hex(self.iteration % self.r * 64)[2:].zfill(2)
+                    gr = hex(self.iteration % self.g * 32)[2:].zfill(2)
+                    bl = hex(self.iteration % self.b * 16)[2:].zfill(2)
+                    self.image.put("#" + rd + gr + bl, (x, y))
+
+        self.iteration += 1
+        print(self.iteration)
 
 
-img = tkinter.PhotoImage(width=WIDTH, height=HEIGHT)
-xa = -2.0
-xb = 2.0
-ya = -1.5
-yb = 1.5
-for ky in range(HEIGHT):
-    for kx in range(WIDTH):
-        c = complex(xa + (xb - xa) * kx / WIDTH, ya + (yb - ya) * ky / HEIGHT)
-        z = complex(0.0, 0.0)
-        for i in range(ITERATIONS):
-            z = z * z + c
-            if abs(z) >= 2.0:
-                break
-        rd = hex(i % 4 * 64)[2:].zfill(2)
-        gr = hex(i % 8 * 32)[2:].zfill(2)
-        bl = hex(i % 16 * 16)[2:].zfill(2)
-        img.put("#" + rd + gr + bl, (kx, ky))
+if __name__ == "__main__":
+    WIDTH = 1024
+    HEIGHT = 768
+    ITERATIONS = 25
+    root = tkinter.Tk()
 
-canvas = tkinter.Canvas(root, width=WIDTH, height=HEIGHT)
-canvas.pack()
-canvas.create_image((WIDTH/2, HEIGHT/2), image=img)
+    canvas = tkinter.Canvas(root, width=WIDTH, height=HEIGHT)
+    canvas.pack()
 
+    fractal = Mandelbrot(WIDTH, HEIGHT, -2.0, 2.0, -1.5, 1.5)
+    fractal.compute()
+    canvas.create_image((WIDTH / 2, HEIGHT / 2), image=fractal.image)
 
-root.mainloop()
+    root.mainloop()
