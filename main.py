@@ -9,22 +9,37 @@ class Frame:
     def __init__(self, width, height, fractal):
         self.fractal = fractal
 
-        self.image = 0
+        self.image = None
+        self.image_shown = 0
         self.image_rate = 100
         self.root = tkinter.Tk()
         self.canvas = tkinter.Canvas(self.root, width=width, height=height)
         self.canvas.pack()
         self.root.after("idle", self.action)
 
+    def colorize(self, iteration):
+        if not self.image:
+            self.image = tkinter.PhotoImage(width=self.fractal.width, height=self.fractal.height)
+
+        for y in range(self.fractal.height):
+            for x in range(self.fractal.width):
+                i = self.fractal.decided[x, y]
+                if i >= 0:
+                    r = hex(16*i % 256)[2:].zfill(2)
+                    g = hex(8*i % 256)[2:].zfill(2)
+                    b = hex(4*i % 256)[2:].zfill(2)
+                    self.image.put("#" + r + g + b, (x, y))
+
     def action(self):
         if self.fractal.iteration < self.fractal.iterations:
             self.fractal.compute()
 
+        self.colorize(self.image_shown)
         self.canvas.create_image((self.fractal.width / 2,
-                                  self.fractal.height / 2), image=self.fractal.images[self.image])
-        self.image += 1
-        if self.image >= len(self.fractal.images):
-            self.image = 0
+                                  self.fractal.height / 2), image=self.image)
+        self.image_shown += 1
+        if self.image_shown >= len(self.fractal.images):
+            self.image_shown = 0
 
         self.root.after(self.image_rate, self.action)
 
