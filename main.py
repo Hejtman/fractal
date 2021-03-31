@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import time
 import tkinter
 
 from fractal.mandelbrot import Mandelbrot
@@ -24,15 +25,17 @@ class Frame:
         for y in range(self.fractal.height):
             for x in range(self.fractal.width):
                 i = self.fractal.decided[x, y]
-                if i >= 0:
+                if 0 <= i <= iteration:
                     r = hex(16*i % 256)[2:].zfill(2)
                     g = hex(8*i % 256)[2:].zfill(2)
                     b = hex(4*i % 256)[2:].zfill(2)
                     self.image.put("#" + r + g + b, (x, y))
 
     def action(self):
-        if self.fractal.iteration < self.fractal.iterations:
-            self.fractal.compute()
+        if self.fractal.computing_iteration < self.fractal.total_iterations:
+            start_time = time.time()
+            self.fractal.compute3()
+            print(f'{self.fractal.computing_iteration} {time.time()-start_time}')
 
         self.colorize(self.image_shown)
         self.canvas.create_image((self.fractal.width / 2,
@@ -45,5 +48,5 @@ class Frame:
 
 
 if __name__ == "__main__":
-    world = Frame(width=640, height=480, fractal=Mandelbrot(640, 480, iterations=25))
+    world = Frame(width=640, height=480, fractal=Mandelbrot(640, 480, iterations=5))
     world.root.mainloop()
