@@ -32,10 +32,10 @@ class Frame:
                     self.image.put("#" + r + g + b, (x, y))
 
     def action(self):
-        if self.fractal.computing_iteration < self.fractal.total_iterations:
+        if self.fractal.iteration < self.fractal.iterations:
             start_time = time.time()
             self.fractal.compute3()
-            print(f'{self.fractal.computing_iteration} {time.time()-start_time}')
+            print(f'{self.fractal.iteration} {time.time()-start_time}')
 
         self.colorize(self.image_shown)
         self.canvas.create_image((self.fractal.width / 2,
@@ -48,5 +48,5 @@ class Frame:
 
 
 if __name__ == "__main__":
-    world = Frame(width=640, height=480, fractal=Mandelbrot(640, 480, iterations=5))
+    world = Frame(width=1024, height=768, fractal=Mandelbrot(400, 400, iterations=5))
     world.root.mainloop()
